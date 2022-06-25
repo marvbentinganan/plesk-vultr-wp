@@ -2,10 +2,18 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class PleskInstance extends Model
 {
-    use HasFactory;
+    protected $table = 'plesk_instances';
+
+    protected $primaryKey = 'plesk_instance_id';
+
+    protected $guarded = ['plesk_instance_id'];
+
+    public function customer()
+    {
+        return $this->belongsTo(Customer::class, 'customer_id', 'customer_id');
+    }
 }

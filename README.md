@@ -14,6 +14,7 @@ customers
 servers
 - server_id
 - provider_id
+- customer_id
 - default_password
 - hostname
 - ip_address

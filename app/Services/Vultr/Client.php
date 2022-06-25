@@ -3,6 +3,7 @@
 namespace App\Services\Vultr;
 
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Str;
 
 class Client
 {
@@ -22,22 +23,27 @@ class Client
 
     public function listInstances()
     {
-        return $this->client->get("{$this->apiUrl}/instances")->object();
+        return $this->client->get("{$this->apiUrl}/instances");
     }
 
     public function listApplications(string $type = 'all')
     {
-        return $this->client->get("{$this->apiUrl}/applications?type={$type}")->object();
+        return $this->client->get("{$this->apiUrl}/applications?type={$type}");
     }
 
     public function listPlans(string $type = 'all')
     {
-        return $this->client->get("{$this->apiUrl}/plans?type={$type}")->object();
+        return $this->client->get("{$this->apiUrl}/plans?type={$type}");
     }
 
     public function listRegions()
     {
-        return $this->client->get("{$this->apiUrl}/regions")->object();
+        return $this->client->get("{$this->apiUrl}/regions");
+    }
+
+    public function listSshKeys()
+    {
+        return $this->client->get("{$this->apiUrl}/ssh-keys");
     }
 
     public function createInstance(int $appId = 31, string $region = 'lhr', string $plan = 'vc2-1c-2gb')
@@ -45,10 +51,22 @@ class Client
         // Define defaults
         // App ID 31 is Plesk Web Admin
         // lhr is London
+        $data = collect([
+            'region' => $region,
+            'plan' => $plan,
+            'app_id' => $appId,
+            'activation_email' => true,
+            'sshkey_id' => ['17cdbce3-d562-4227-a1e8-a3f90b875396'],
+            'backups' => 'enabled',
+            'hostname' => sprintf('%s-%s-%s-%s', 'vtr', $region, 'web', Str::random(5)),
+            'label' => sprintf('%s-%s-%s-%s', 'vtr', $region, 'web', Str::random(5))
+        ])->toArray();
+
+        return $this->client->post("{$this->apiUrl}/instances", $data);
     }
 
-    public function getInstance($instanceId)
+    public function getInstance(string $instanceId)
     {
-        return $this->client->get("{$this->apiUrl}/instances/{$instanceId}")->object();
+        return $this->client->get("{$this->apiUrl}/instances/{$instanceId}");
     }
 }

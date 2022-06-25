@@ -15,9 +15,9 @@ class CreateCustomersTable extends Migration
     {
         Schema::create('customers', function (Blueprint $table) {
             $table->id('customer_id');
+            $table->string('name');
+            $table->string('email');
             $table->string('domain');
-            $table->foreignId('server_id')->references('server_id')->on('servers')->nullable();
-            $table->foreignId('plesk_instance_id')->references('plesk_instance_id')->on('plesk_instances')->nullable();
             $table->timestamps();
         });
     }

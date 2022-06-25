@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\Plesk;
+namespace App\Services\Vultr;
 
 use Illuminate\Support\ServiceProvider;
 

@@ -4,7 +4,7 @@ namespace App\Services\Plesk;
 
 use Illuminate\Support\ServiceProvider;
 
-class VultrServiceProvider extends ServiceProvider
+class PleskServiceProvider extends ServiceProvider
 {
     /**
      * Bootstrap any package services.

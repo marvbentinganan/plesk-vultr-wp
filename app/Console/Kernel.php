@@ -2,7 +2,6 @@
 
 namespace App\Console;
 
-use App\Services\WebsiteCustodian\Commands\AgentData;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
@@ -16,7 +15,7 @@ class Kernel extends ConsoleKernel
      * @return void
      */
     protected $commands = [
-        AgentData::class,
+
     ];
 
     protected function schedule(Schedule $schedule)

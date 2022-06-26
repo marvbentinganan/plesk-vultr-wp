@@ -36,7 +36,7 @@ This is an API endpoint and service to deploy and configure a Plesk instance on 
 - [x] Enable Nginx Caching
 - [x] Enable IPV4 Reverse DNS
 - [ ] Install and Enable Firewall
-= [ ] Record Demo Video
+- [ ] Record Demo Video
 
 ### QOL Changes
 

@@ -11,7 +11,8 @@ class UpdateDNS extends Command
      *
      * @var string
      */
-    protected $signature = 'vp:update-dns';
+    protected $signature = 'vp:update-dns
+                            {--serverID=}';
 
     /**
      * The console command description.

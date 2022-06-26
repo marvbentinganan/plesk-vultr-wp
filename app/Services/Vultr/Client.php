@@ -18,30 +18,30 @@ class Client
                 'Authorization' => sprintf('%s %s', 'Bearer', config('services.vultr.api'))
             ]
         );
-        $this->apiUrl = 'https://api.vultr.com/v2';
+        $this->apiUrl = config('services.vultr.api_endpoint');
     }
 
-    public function listInstances()
+    public function getInstances()
     {
         return $this->client->get("{$this->apiUrl}/instances");
     }
 
-    public function listApplications(string $type = 'all')
+    public function getApplications(string $type = 'all')
     {
         return $this->client->get("{$this->apiUrl}/applications?type={$type}");
     }
 
-    public function listPlans(string $type = 'all')
+    public function getPlans(string $type = 'all')
     {
         return $this->client->get("{$this->apiUrl}/plans?type={$type}");
     }
 
-    public function listRegions()
+    public function getRegions()
     {
         return $this->client->get("{$this->apiUrl}/regions");
     }
 
-    public function listSshKeys()
+    public function getSshKeys()
     {
         return $this->client->get("{$this->apiUrl}/ssh-keys");
     }
@@ -58,8 +58,8 @@ class Client
             'activation_email' => true,
             'sshkey_id' => ['17cdbce3-d562-4227-a1e8-a3f90b875396'],
             'backups' => 'enabled',
-            'hostname' => sprintf('%s-%s-%s-%s', 'vtr', $region, 'web', Str::random(5)),
-            'label' => sprintf('%s-%s-%s-%s', 'vtr', $region, 'web', Str::random(5))
+            'hostname' => sprintf('%s-%s-%s-%s', 'vtr', $region, 'web', Str::random(3)),
+            'label' => sprintf('%s-%s-%s-%s', 'vtr', $region, 'web', Str::random(3))
         ])->toArray();
 
         return $this->client->post("{$this->apiUrl}/instances", $data);
@@ -68,5 +68,15 @@ class Client
     public function getInstance(string $instanceId)
     {
         return $this->client->get("{$this->apiUrl}/instances/{$instanceId}");
+    }
+
+    public function updateReverseDNS(string $instanceId, string $ipAddress, string $domain)
+    {
+        $data = collect([
+            'ip' => $ipAddress,
+            'reverse' => $domain
+        ])->toArray();
+
+        return $this->client->post("{$this->apiUrl}/instances/{$instanceId}/ipv4/reverse", $data);
     }
 }

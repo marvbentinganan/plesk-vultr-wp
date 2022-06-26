@@ -4,7 +4,6 @@ namespace App\Services\Plesk;
 
 use App\Models\Customer;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Str;
 
 class Client
 {
@@ -25,7 +24,14 @@ class Client
         );
     }
 
-    public function initialize(Customer $customer, string $password = '~qRo3cB0Hbdu8zun')
+    /**
+     * Setup Administrator user and Custom Panel Domain
+     *
+     * @param Customer $customer
+     * @param string $password
+     * @return Response
+     */
+    public function initialize(Customer $customer, string $password)
     {
         $data = collect([
             'admin' => [
@@ -39,17 +45,35 @@ class Client
         return $this->client->post("{$this->host}/server/init", $data);
     }
 
+    public function setHostname($hostname)
+    {
+        $data = collect([
+            'params' => [
+                '--set',
+                'FullHostName',
+                $hostname
+            ],
+        ])->toArray();
+
+        return $this->client->post("{$this->host}/cli/settings/call", $data);
+    }
+
+    /**
+     * Add Domain to Plesk instance
+     *
+     * @param Customer $customer
+     * @return Response
+     */
     public function addDomain(Customer $customer)
     {
-        $client = $this->listClients()->collect()->first();
-        $guid = Str::uuid(32);
+        $client = $this->getClients()->collect()->first();
         $data = collect([
             'name' => $customer->domain,
             'description' => 'My website',
             'hosting_type' => 'virtual',
             'hosting_settings' => [
                 'ftp_login' => 'ftpuser',
-                'ftp_password' => '~qRo3cB0Hbdu8zun'
+                'ftp_password' => config('services.plesk.panel_password')
             ],
             'owner_client' => [
                 'id' => $client['id'],
@@ -63,6 +87,51 @@ class Client
         return $this->client->post("{$this->host}/domains", $data);
     }
 
+    public function installWordPress(Customer $customer)
+    {
+        $data = collect([
+            'params' => [
+                '--call',
+                'wp-toolkit',
+                '--install',
+                '-domain-name',
+                $customer->domain,
+                '-admin-email',
+                $customer->email
+            ],
+            'env' => [
+                'ADMIN_PASSWORD' => config('services.plesk.wordpress_password')
+            ]
+        ])->toArray();
+
+        return $this->client->post("{$this->host}/cli/extension/call", $data);
+    }
+
+    public function enableCaching(Customer $customer)
+    {
+        $data = collect([
+            'params' => [
+            '--update-web-server-settings',
+            $customer->domain,
+            '-nginx-cache-enabled',
+            'true',
+            '-nginx-cache-timeout',
+            '60',
+            '-nginx-cache-key',
+            sprintf('%s%s%s', "'", '$scheme$request_method$host$request_uri', "'"),
+            '-nginx-cache-bypass-locations',
+            "'/wp-admin/'"
+            ]
+        ])->toArray();
+
+        return $this->client->post("{$this->host}/cli/subscription/call", $data);
+    }
+
+    /**
+     * Add Let's Encrypt SSL Certificate to Plesk Panel
+     *
+     * @return Response
+     */
     public function addPanelCertificate()
     {
         $data = collect([
@@ -76,26 +145,127 @@ class Client
         return $this->client->post("{$this->host}/cli/server_pref/call", $data);
     }
 
-    public function addDomainCertificate()
+    public function addDomainCertificate(Customer $customer)
     {
+        $data = collect([
+            'params' => [
+            '--call',
+            'sslit',
+            '--certificate',
+            '-issue',
+            '-domain',
+            $customer->domain,
+            '-registrationEmail',
+            $customer->email,
+            '-secure-domain',
+            '-secure-www',
+            '-secure-webmail',
+            '-secure-mail'
+            ]
+        ])->toArray();
+
+        return $this->client->post("{$this->host}/cli/extension/call", $data);
     }
 
-    public function listCommands()
+    /**
+     * Enable Keep Plesk Secured
+     *
+     * @return void
+     */
+    public function enableKeepSecured()
+    {
+        $data = collect([
+            'params' => [
+            '--call',
+            'sslit',
+            '--panel-keep-secured',
+            '-enable'
+            ]
+        ])->toArray();
+
+        return $this->client->post("{$this->host}/cli/extension/call", $data);
+    }
+
+    /**
+     * Enable HSTS
+     *
+     * @param Customer $customer
+     * @return Response
+     */
+    public function enableHSTS(Customer $customer)
+    {
+        $data = collect([
+            'params' => [
+            '--call',
+            'sslit',
+            '--hsts',
+            '-enable',
+            '-domain',
+            $customer->domain,
+            ]
+        ])->toArray();
+
+        return $this->client->post("{$this->host}/cli/extension/call", $data);
+    }
+
+    /**
+     * Enable OCSP Stapling
+     *
+     * @param Customer $customer
+     * @return Response
+     */
+    public function enableOCSP(Customer $customer)
+    {
+        $data = collect([
+            'params' => [
+            '--call',
+            'sslit',
+            '--ocsp-stapling',
+            '-enable',
+            '-domain',
+            $customer->domain,
+            ]
+        ])->toArray();
+
+        return $this->client->post("{$this->host}/cli/extension/call", $data);
+    }
+
+    /**
+     * Get List of available CLI Commands
+     *
+     * @return Response
+     */
+    public function getCommands()
     {
         return $this->client->get("{$this->host}/cli/commands");
     }
 
-    public function listClients()
+    /**
+     * Get List of Clients for the Plesk Instance
+     *
+     * @return Response
+     */
+    public function getClients()
     {
         return $this->client->get("{$this->host}/clients");
     }
 
-    public function listDomains()
+    /**
+     * Get List of Domains added to Plesk Instance
+     *
+     * @return void
+     */
+    public function getDomains()
     {
         return $this->client->get("{$this->host}/domains");
     }
 
-    public function listExtensions()
+    /**
+     * Get List of available extensions
+     *
+     * @return Response
+     */
+    public function getExtensions()
     {
         return $this->client->get("{$this->host}/extensions");
     }

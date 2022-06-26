@@ -32,9 +32,12 @@ return [
 
     'plesk' => [
         'api' => env('PLESK_API'),
+        'panel_password' => env('DEFAULT_PLESK_PASSWORD'),
+        'wordpress_password' => env('DEFAULT_WP_PASSWORD')
     ],
 
     'vultr' => [
-        'api' => env('VULTR_API')
+        'api' => env('VULTR_API'),
+        'api_endpoint' => env('VULTR_API_ENDPOINT')
     ],
 ];

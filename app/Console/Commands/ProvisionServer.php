@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Models\Customer;
 use App\Models\Server;
 use App\Services\Vultr\Client;
 use Illuminate\Console\Command;
@@ -14,7 +15,9 @@ class ProvisionServer extends Command
      * @var string
      */
     protected $signature = 'vp:create-server
-                            {--customerId=}';
+                            {--domain=}
+                            {--email=}
+                            {--name=}';
 
     /**
      * The console command description.
@@ -40,6 +43,12 @@ class ProvisionServer extends Command
      */
     public function handle()
     {
+        $customer = Customer::create([
+            'name' => $this->option('name'),
+            'email' => $this->option('email'),
+            'domain' => $this->option('domain')
+        ]);
+
         $client = new Client();
 
         $response = $client->createInstance();
@@ -48,31 +57,29 @@ class ProvisionServer extends Command
         $instance = $response->collect()['instance'];
 
         $server = Server::create([
-            'customer_id' => $this->option('customerId'),
-            'provider_id' => $instance['id'],
-            'default_password' => $instance['default_password'],
-            'hostname' => $instance['hostname'],
-            'ip_address' => $instance['main_ip'],
-            'plan' => $instance['plan'],
-            'region' => $instance['region'],
-            'status' => $instance['status']
-        ]);
+                'customer_id' => $customer->getKey(),
+                'provider_id' => $instance['id'],
+                'default_password' => $instance['default_password'],
+                'hostname' => $instance['hostname'],
+                'ip_address' => $instance['main_ip'],
+                'plan' => $instance['plan'],
+                'region' => $instance['region'],
+                'status' => $instance['status']
+            ]);
 
-        // Do While loop here, if status is active,
+        // Do While loop here, to check if server is done provisioning
         do {
             $response = $client->getInstance($server->provider_id);
-            if ($response->successful()) {
-                $instance = $response->collect()['instance'];
-                $status = $instance['status'];
-            } else {
-                $status = 'pending';
-            }
+            $instance = $response->collect()['instance'];
+            $status = $instance['status'];
+
             $this->info('Server is still provisioning...');
-            // Pause for 2 minutes before checking again
-            sleep(120);
+            // Pause for a minutes before checking again
+            sleep(60);
         } while ($status != 'active');
 
         $this->info('Done Provisioning. Updating local server record.');
+
         // Update server record
         $server->update([
             'status' => $instance['status'],
@@ -81,8 +88,8 @@ class ProvisionServer extends Command
 
         $this->info("Server created with IP Address: {$server->ip_address}");
 
+        // Update DNS Records
         // Start vp-configure-server command
-
         return Command::SUCCESS;
     }
 }

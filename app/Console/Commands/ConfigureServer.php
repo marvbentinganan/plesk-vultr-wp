@@ -7,6 +7,7 @@ use App\Models\PleskInstance;
 use App\Models\Server;
 use App\Services\Plesk\AdminClient;
 use App\Services\Plesk\Client;
+use App\Services\Vultr\Client as VultrClient;
 use Illuminate\Console\Command;
 
 class ConfigureServer extends Command
@@ -52,7 +53,6 @@ class ConfigureServer extends Command
 
         $this->info('Generating Plesk API Key');
         $apiKey = $pleskAdminClient->createApiKey()->collect();
-        dump($apiKey);
 
         $plesk = PleskInstance::create([
             'server_id' => $server->getKey(),
@@ -62,11 +62,41 @@ class ConfigureServer extends Command
             'custom_domain' => sprintf('%s.%s', 'panel', $customer->domain)
         ]);
 
-        // Connect Domain - domain.tld
         $pleskClient = new Client($server->ip_address, $plesk->api_key);
 
+        // Configure Panel URL and Login
+        $panel = $pleskClient->initialize($customer, config('services.plesk.panel_password'));
+        if ($panel->successful()) {
+            $this->info('Panel Initialized');
+            $pleskClient->setHostname(sprintf('%s.%s', 'panel', $customer->domain));
+            // Add Panel SSL Certificate
+            $pleskClient->addPanelCertificate();
+            $pleskClient->enableKeepSecured();
+        }
 
-        // Setup SSL - panel.domain.tld
+        // Add Domain to Plesk
+        $domain = $pleskClient->addDomain($customer);
+        if ($domain->successful()) {
+            $this->info("Domain {$customer->domain} added to Plesk");
+            // Install WordPress
+            $install = $pleskClient->installWordPress($customer);
+
+            if ($install->collect()['code'] == 0) {
+                $pleskClient->enableCaching($customer);
+
+                $certificate = $pleskClient->addDomainCertificate($customer);
+                if ($certificate->collect()['code'] == 0) {
+                    $hsts = $pleskClient->enableHSTS($customer)->collect();
+                    $this->info("{$hsts['stdout']}");
+                    $ocsp = $pleskClient->enableOCSP($customer)->collect();
+                    $this->info("{$ocsp['stdout']}");
+                }
+            }
+        }
+
+        // Update Reverse DNS
+        $vultr = new VultrClient();
+        $vultr->updateReverseDNS($server->provider_id, $server->ip_address, $customer->domain);
 
         return Command::SUCCESS;
     }

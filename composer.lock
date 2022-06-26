@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "ba565dedf50475b7ddb74103ac15232c",
+    "content-hash": "c71e2d704cc1c0ec7960393550cb0db9",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -121,6 +121,54 @@
                 }
             ],
             "time": "2021-08-15T20:50:18+00:00"
+        },
+        {
+            "name": "cloudflare/sdk",
+            "version": "1.3.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/cloudflare/cloudflare-php.git",
+                "reference": "fdfc656aa8b78016f4722acec30b54136c027d8e"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/cloudflare/cloudflare-php/zipball/fdfc656aa8b78016f4722acec30b54136c027d8e",
+                "reference": "fdfc656aa8b78016f4722acec30b54136c027d8e",
+                "shasum": ""
+            },
+            "require": {
+                "ext-json": "*",
+                "guzzlehttp/guzzle": "^7.0.1",
+                "php": ">=7.2.5",
+                "psr/http-message": "~1.0"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "^2.6",
+                "phpmd/phpmd": "@stable",
+                "phpunit/phpunit": "^5.7"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Cloudflare\\API\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Junade Ali",
+                    "email": "junade@cloudflare.com"
+                }
+            ],
+            "description": "PHP binding for v4 of the Cloudflare Client API.",
+            "support": {
+                "issues": "https://github.com/cloudflare/cloudflare-php/issues",
+                "source": "https://github.com/cloudflare/cloudflare-php/tree/1.3.0"
+            },
+            "time": "2021-10-13T03:40:33+00:00"
         },
         {
             "name": "dflydev/dot-access-data",
@@ -2924,87 +2972,32 @@
             "time": "2021-09-25T23:10:38+00:00"
         },
         {
-            "name": "spatie/macroable",
-            "version": "1.0.1",
+            "name": "spatie/ssh",
+            "version": "1.7.2",
             "source": {
                 "type": "git",
-                "url": "https://github.com/spatie/macroable.git",
-                "reference": "7a99549fc001c925714b329220dea680c04bfa48"
+                "url": "https://github.com/spatie/ssh.git",
+                "reference": "81c7aa039270dda63d8cf279655e3537c543ed49"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/macroable/zipball/7a99549fc001c925714b329220dea680c04bfa48",
-                "reference": "7a99549fc001c925714b329220dea680c04bfa48",
+                "url": "https://api.github.com/repos/spatie/ssh/zipball/81c7aa039270dda63d8cf279655e3537c543ed49",
+                "reference": "81c7aa039270dda63d8cf279655e3537c543ed49",
                 "shasum": ""
             },
             "require": {
-                "php": "^7.2|^8.0"
-            },
-            "require-dev": {
-                "phpunit/phpunit": "^8.0|^9.3"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Spatie\\Macroable\\": "src"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Freek Van der Herten",
-                    "email": "freek@spatie.be",
-                    "homepage": "https://spatie.be",
-                    "role": "Developer"
-                }
-            ],
-            "description": "A trait to dynamically add methods to a class",
-            "homepage": "https://github.com/spatie/macroable",
-            "keywords": [
-                "macroable",
-                "spatie"
-            ],
-            "support": {
-                "issues": "https://github.com/spatie/macroable/issues",
-                "source": "https://github.com/spatie/macroable/tree/1.0.1"
-            },
-            "time": "2020-11-03T10:15:05+00:00"
-        },
-        {
-            "name": "spatie/ssl-certificate",
-            "version": "1.22.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/spatie/ssl-certificate.git",
-                "reference": "c4756c3f18f9abeea62cfe99fc841229d9fead2c"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/spatie/ssl-certificate/zipball/c4756c3f18f9abeea62cfe99fc841229d9fead2c",
-                "reference": "c4756c3f18f9abeea62cfe99fc841229d9fead2c",
-                "shasum": ""
-            },
-            "require": {
-                "ext-intl": "*",
-                "ext-json": "*",
-                "nesbot/carbon": "^2.23",
                 "php": "^7.4|^8.0",
-                "spatie/macroable": "^1.0"
+                "symfony/process": "^4.4|^5.3|^6.0"
             },
             "require-dev": {
-                "phpunit/phpunit": "^9.0",
-                "spatie/phpunit-snapshot-assertions": "^4.2.3"
+                "phpunit/phpunit": "^9.5",
+                "spatie/phpunit-snapshot-assertions": "^4.2",
+                "symfony/var-dumper": "^5.3|6.0"
             },
             "type": "library",
             "autoload": {
-                "files": [
-                    "src/helpers.php"
-                ],
                 "psr-4": {
-                    "Spatie\\SslCertificate\\": "src"
+                    "Spatie\\Ssh\\": "src"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -3019,27 +3012,23 @@
                     "role": "Developer"
                 }
             ],
-            "description": "A class to easily query the properties of an ssl certificate",
-            "homepage": "https://github.com/spatie/ssl-certificate",
+            "description": "A lightweight package to execute commands over an SSH connection",
+            "homepage": "https://github.com/spatie/ssh",
             "keywords": [
                 "spatie",
-                "ssl-certificate"
+                "ssh"
             ],
             "support": {
-                "issues": "https://github.com/spatie/ssl-certificate/issues",
-                "source": "https://github.com/spatie/ssl-certificate/tree/1.22.1"
+                "issues": "https://github.com/spatie/ssh/issues",
+                "source": "https://github.com/spatie/ssh/tree/1.7.2"
             },
             "funding": [
                 {
-                    "url": "https://github.com/sponsors/spatie",
-                    "type": "github"
-                },
-                {
                     "url": "https://spatie.be/open-source/support-us",
-                    "type": "other"
+                    "type": "custom"
                 }
             ],
-            "time": "2021-02-15T15:42:15+00:00"
+            "time": "2021-12-21T10:21:54+00:00"
         },
         {
             "name": "swiftmailer/swiftmailer",
@@ -8085,5 +8074,5 @@
         "php": "^7.3|^8.0"
     },
     "platform-dev": [],
-    "plugin-api-version": "2.1.0"
+    "plugin-api-version": "2.3.0"
 }

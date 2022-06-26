@@ -2,23 +2,26 @@
 
 namespace App\Console\Commands;
 
+use App\Models\Server;
 use Illuminate\Console\Command;
+use Spatie\Ssh\Ssh;
 
-class CreateWebsite extends Command
+class InstallPleskFirewall extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'vp:create-website';
+    protected $signature = 'vp:install-firewall
+                            {--serverId=}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Add a wordpress site to your Plesk instance.';
+    protected $description = 'Install and Enable the Plesk Firewall';
 
     /**
      * Create a new command instance.
@@ -37,6 +40,12 @@ class CreateWebsite extends Command
      */
     public function handle()
     {
+        $server = Server::find($this->option('serverId'));
+        $command = 'plesk installer add --components psa-firewall';
+
+        $process = Ssh::create('root', $server->ip_address)->disableStrictHostKeyChecking()->execute($command);
+        dump($process->getOutput());
+
         return Command::SUCCESS;
     }
 }

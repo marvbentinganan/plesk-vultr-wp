@@ -65,38 +65,54 @@ class ConfigureServer extends Command
         $pleskClient = new Client($server->ip_address, $plesk->api_key);
 
         // Configure Panel URL and Login
+        $this->info('Setting Up Panel');
         $panel = $pleskClient->initialize($customer, config('services.plesk.panel_password'));
         if ($panel->successful()) {
-            $this->info('Panel Initialized');
+            $this->info('Updating Panel Hostname');
             $pleskClient->setHostname(sprintf('%s.%s', 'panel', $customer->domain));
+            $this->info('Hostname Updated');
             // Add Panel SSL Certificate
+            $this->info('Securing Panel with SSL Certificate');
             $pleskClient->addPanelCertificate();
             $pleskClient->enableKeepSecured();
+            $this->info('SSL Certificate added to Panel');
         }
 
         // Add Domain to Plesk
+        $this->info('Adding Domain to Panel');
         $domain = $pleskClient->addDomain($customer);
         if ($domain->successful()) {
             $this->info("Domain {$customer->domain} added to Plesk");
+            // Add SSL Certificate to domain
+            $this->info('Securing Site with SSL Certificate');
+            $certificate = $pleskClient->addDomainCertificate($customer);
+
+            if ($certificate->collect()['code'] == 0) {
+                // Improve SSL Settings
+                $this->info('Improving SSL Settings');
+                $hsts = $pleskClient->enableHSTS($customer)->collect();
+                $this->info("{$hsts['stdout']}");
+                $ocsp = $pleskClient->enableOCSP($customer)->collect();
+                $this->info("{$ocsp['stdout']}");
+            }
+
             // Install WordPress
+            $this->info('Installing WordPress Site');
             $install = $pleskClient->installWordPress($customer);
 
             if ($install->collect()['code'] == 0) {
+                // Enable Caching
+                $this->info('Enabling Nginx Cache');
                 $pleskClient->enableCaching($customer);
-
-                $certificate = $pleskClient->addDomainCertificate($customer);
-                if ($certificate->collect()['code'] == 0) {
-                    $hsts = $pleskClient->enableHSTS($customer)->collect();
-                    $this->info("{$hsts['stdout']}");
-                    $ocsp = $pleskClient->enableOCSP($customer)->collect();
-                    $this->info("{$ocsp['stdout']}");
-                }
             }
         }
 
         // Update Reverse DNS
+        $this->info('Updating Reverse DNS');
         $vultr = new VultrClient();
         $vultr->updateReverseDNS($server->provider_id, $server->ip_address, $customer->domain);
+
+        $this->info('Configuration Complete!');
 
         return Command::SUCCESS;
     }

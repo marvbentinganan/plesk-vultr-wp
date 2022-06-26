@@ -26,7 +26,7 @@ class OrderSeeder extends Seeder
             ]
         );
 
-        $customer->domain()->updateOrCreate(
+        $customer->domains()->updateOrCreate(
             [
                 'name' => 'marviebenti.com'
             ],

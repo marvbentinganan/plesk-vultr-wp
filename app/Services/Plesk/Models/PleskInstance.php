@@ -1,7 +1,10 @@
 <?php
 
-namespace App\Models;
+namespace App\Services\Plesk\Models;
 
+use App\Models\Customer;
+use App\Models\Domain;
+use App\Services\Vultr\Models\Server;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -22,7 +25,7 @@ class PleskInstance extends Model
 
     public function server()
     {
-        return $this->belongsTo(Domain::class, 'server_id', 'server_id');
+        return $this->belongsTo(Server::class, 'server_id', 'server_id');
     }
 
     public function domains()

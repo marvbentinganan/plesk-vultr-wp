@@ -22,10 +22,10 @@ class CreateDomainsTable extends Migration
             $table->boolean('caching_enabled')->default(false);
             $table->boolean('improved_ssl')->default(false);
             $table->foreignId('customer_id')->references('customer_id')->on('customers');
-            $table->foreignId('server_id')->references('server_id')->on('servers')->nullable();
-            $table->foreignId('plesk_instance_id')->references('plesk_instance_id')->on('plesk_instances')->nullable();
+            $table->unsignedBigInteger('server_id')->nullable();
+            $table->unsignedBigInteger('plesk_instance_id')->nullable();
             $table->string('status')->default('pending');
-            $table->timestamp('processed_at');
+            $table->timestamp('processed_at')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

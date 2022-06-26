@@ -51,8 +51,7 @@ class Client
         $data = collect([
             'params' => [
                 '--set',
-                'FullHostName',
-                $hostname
+                sprintf('%s=%s', 'FullHostName', $hostname)
             ],
         ])->toArray();
 
@@ -133,7 +132,7 @@ class Client
      *
      * @return Response
      */
-    public function addPanelCertificate()
+    public function addPanelCertificate(string $domain, string $email)
     {
         $data = collect([
             'params' => [

@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Services\Plesk\Models\PleskInstance;
+use App\Services\Vultr\Models\Server;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 

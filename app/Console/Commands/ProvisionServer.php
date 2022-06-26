@@ -3,8 +3,8 @@
 namespace App\Console\Commands;
 
 use App\Models\Domain;
-use App\Models\Server;
 use App\Services\Vultr\Client;
+use App\Services\Vultr\Models\Server;
 use Illuminate\Console\Command;
 
 class ProvisionServer extends Command

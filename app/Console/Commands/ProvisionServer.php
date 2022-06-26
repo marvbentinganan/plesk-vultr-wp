@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use App\Models\Customer;
+use App\Models\Domain;
 use App\Models\Server;
 use App\Services\Vultr\Client;
 use Illuminate\Console\Command;
@@ -15,9 +15,7 @@ class ProvisionServer extends Command
      * @var string
      */
     protected $signature = 'vp:create-server
-                            {--domain=}
-                            {--email=}
-                            {--name=}';
+                            {--domainId=}';
 
     /**
      * The console command description.
@@ -43,11 +41,9 @@ class ProvisionServer extends Command
      */
     public function handle()
     {
-        $customer = Customer::create([
-            'name' => $this->option('name'),
-            'email' => $this->option('email'),
-            'domain' => $this->option('domain')
-        ]);
+        $domain = Domain::find($this->option('domainId'));
+
+        $customer = $domain->customer;
 
         $client = new Client();
 
@@ -57,15 +53,21 @@ class ProvisionServer extends Command
         $instance = $response->collect()['instance'];
 
         $server = Server::create([
-                'customer_id' => $customer->getKey(),
-                'provider_id' => $instance['id'],
-                'default_password' => $instance['default_password'],
-                'hostname' => $instance['hostname'],
-                'ip_address' => $instance['main_ip'],
-                'plan' => $instance['plan'],
-                'region' => $instance['region'],
-                'status' => $instance['status']
-            ]);
+            'customer_id' => $customer->getKey(),
+            'provider_id' => $instance['id'],
+            'default_password' => $instance['default_password'],
+            'hostname' => $instance['hostname'],
+            'ip_address' => $instance['main_ip'],
+            'plan' => $instance['plan'],
+            'region' => $instance['region'],
+            'status' => $instance['status']
+        ]);
+
+        // Update domain record
+        $domain->update([
+            'server_id' => $server->getKey()
+        ]);
+
 
         // Do While loop here, to check if server is done provisioning
         do {

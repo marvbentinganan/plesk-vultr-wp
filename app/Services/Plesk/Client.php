@@ -3,6 +3,7 @@
 namespace App\Services\Plesk;
 
 use App\Models\Customer;
+use App\Models\Domain;
 use Illuminate\Support\Facades\Http;
 
 class Client
@@ -31,7 +32,7 @@ class Client
      * @param string $password
      * @return Response
      */
-    public function initialize(Customer $customer, string $password)
+    public function initialize(Customer $customer, string $password, string $panel)
     {
         $data = collect([
             'admin' => [
@@ -39,7 +40,7 @@ class Client
                 'email' => $customer->email
             ],
             'password' => $password,
-            'server_name' => sprintf('%s.%s', 'panel', $customer->domain)
+            'server_name' => $panel
         ])->toArray();
 
         return $this->client->post("{$this->host}/server/init", $data);
@@ -64,11 +65,11 @@ class Client
      * @param Customer $customer
      * @return Response
      */
-    public function addDomain(Customer $customer)
+    public function addDomain(string $domain)
     {
         $client = $this->getClients()->collect()->first();
         $data = collect([
-            'name' => $customer->domain,
+            'name' => $domain,
             'description' => 'My website',
             'hosting_type' => 'virtual',
             'hosting_settings' => [
@@ -87,7 +88,7 @@ class Client
         return $this->client->post("{$this->host}/domains", $data);
     }
 
-    public function installWordPress(Customer $customer)
+    public function installWordPress(string $email, string $domain)
     {
         $data = collect([
             'params' => [
@@ -95,9 +96,9 @@ class Client
                 'wp-toolkit',
                 '--install',
                 '-domain-name',
-                $customer->domain,
+                $domain,
                 '-admin-email',
-                $customer->email
+                $email
             ],
             'env' => [
                 'ADMIN_PASSWORD' => config('services.plesk.wordpress_password')
@@ -107,12 +108,12 @@ class Client
         return $this->client->post("{$this->host}/cli/extension/call", $data);
     }
 
-    public function enableCaching(Customer $customer)
+    public function enableCaching(string $domain)
     {
         $data = collect([
             'params' => [
             '--update-web-server-settings',
-            $customer->domain,
+            $domain,
             '-nginx-cache-enabled',
             'true',
             '-nginx-cache-timeout',
@@ -145,7 +146,7 @@ class Client
         return $this->client->post("{$this->host}/cli/server_pref/call", $data);
     }
 
-    public function addDomainCertificate(Customer $customer)
+    public function addDomainCertificate(string $email, string $domain)
     {
         $data = collect([
             'params' => [
@@ -154,9 +155,9 @@ class Client
             '--certificate',
             '-issue',
             '-domain',
-            $customer->domain,
+            $domain,
             '-registrationEmail',
-            $customer->email,
+            $email,
             '-secure-domain',
             '-secure-www',
             '-secure-webmail',
@@ -192,7 +193,7 @@ class Client
      * @param Customer $customer
      * @return Response
      */
-    public function enableHSTS(Customer $customer)
+    public function enableHSTS(string $domain)
     {
         $data = collect([
             'params' => [
@@ -201,7 +202,7 @@ class Client
             '--hsts',
             '-enable',
             '-domain',
-            $customer->domain,
+            $domain,
             ]
         ])->toArray();
 
@@ -214,7 +215,7 @@ class Client
      * @param Customer $customer
      * @return Response
      */
-    public function enableOCSP(Customer $customer)
+    public function enableOCSP(string $domain)
     {
         $data = collect([
             'params' => [
@@ -223,7 +224,7 @@ class Client
             '--ocsp-stapling',
             '-enable',
             '-domain',
-            $customer->domain,
+            $domain,
             ]
         ])->toArray();
 

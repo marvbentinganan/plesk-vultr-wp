@@ -22,7 +22,9 @@ class CreateServersTable extends Migration
             $table->string('plan');
             $table->string('region');
             $table->string('status');
+            $table->boolean('ipv4_reverse_dns')->default(false);
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

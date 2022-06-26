@@ -17,8 +17,10 @@ class CreateCustomersTable extends Migration
             $table->id('customer_id');
             $table->string('name');
             $table->string('email');
-            $table->string('domain');
+            $table->string('username');
+            $table->string('company')->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

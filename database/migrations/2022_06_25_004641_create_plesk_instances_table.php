@@ -18,9 +18,13 @@ class CreatePleskInstancesTable extends Migration
             $table->foreignId('server_id')->references('server_id')->on('servers');
             $table->foreignId('customer_id')->references('customer_id')->on('customers');
             $table->string('api_key')->nullable();
-            $table->string('temporary_domain')->nullable();
-            $table->string('custom_domain')->nullable();
+            $table->boolean('custom_panel')->default(false);
+            $table->boolean('panel_certificate')->default(false);
+            $table->boolean('attached_domain')->default(false);
+            $table->boolean('wordpress_installed')->default(false);
+            $table->boolean('firewall_installed')->default(false);
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

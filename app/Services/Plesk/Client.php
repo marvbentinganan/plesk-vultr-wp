@@ -132,7 +132,7 @@ class Client
      *
      * @return Response
      */
-    public function addPanelCertificate(string $domain, string $email)
+    public function setPanelCertificate(string $domain, string $email)
     {
         $data = collect([
             'params' => [

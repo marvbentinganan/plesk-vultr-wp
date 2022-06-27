@@ -91,7 +91,10 @@ class ProvisionServer extends Command
         $this->info("Server created with IP Address: {$server->ip_address}");
 
         // Update DNS Records
-        // Start vp-configure-server command
+        $this->call('vp:update-dns', ['--domainId' => $domain->getKey(), '--serverId' => $server->getKey()]);
+        // Configure the Server
+        $this->call('vp:configure-server', ['--domainId' => $domain->getKey()]);
+
         return Command::SUCCESS;
     }
 }

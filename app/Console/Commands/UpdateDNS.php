@@ -2,6 +2,9 @@
 
 namespace App\Console\Commands;
 
+use App\Models\Domain;
+use App\Services\DNS\Cloudflare\Client;
+use App\Services\Vultr\Models\Server;
 use Illuminate\Console\Command;
 
 class UpdateDNS extends Command
@@ -12,7 +15,8 @@ class UpdateDNS extends Command
      * @var string
      */
     protected $signature = 'vp:update-dns
-                            {--serverID=}';
+                            {--domainId=}
+                            {--serverId=}';
 
     /**
      * The console command description.
@@ -38,6 +42,81 @@ class UpdateDNS extends Command
      */
     public function handle()
     {
+        $domain = Domain::find($this->option('domainId'));
+        $server = Server::find($this->option('serverId'));
+
+        $dnsclient = new Client($domain->name);
+
+        // Add/Update Primary DNS Record
+        $primary = $dnsclient->getRecordID('A', $domain->name);
+        if ($primary != '') {
+            $this->info('Updating Primary DNS record');
+            $details = collect([
+                'type' => 'A',
+                'name' => $domain->name,
+                'content' => $server->ip_address,
+                'ttl' => 0,
+                'proxied' => false
+            ])->toArray();
+            $dnsclient->updateRecord($primary, $details);
+        } else {
+            $this->info('Adding Primary DNS record');
+            $dnsclient->addRecords('A', $domain->name, $server->ip_address, 0, false);
+        }
+
+        // Add/Update Panel DNS Record
+        $webmail = $dnsclient->getRecordID('A', $domain->webmail);
+        if ($webmail != '') {
+            $this->info('Updating Webmail DNS record');
+            $details = collect([
+                'type' => 'A',
+                'name' => $domain->webmail,
+                'content' => $server->ip_address,
+                'ttl' => 0,
+                'proxied' => false
+            ])->toArray();
+            $dnsclient->updateRecord($webmail, $details);
+        } else {
+            $this->info('Adding Webmail DNS record');
+            $dnsclient->addRecords('A', $domain->panel, $server->ip_address, 0, false);
+        }
+
+        // Add/Update Panel DNS Record
+        $panel = $dnsclient->getRecordID('A', $domain->panel);
+        if ($panel != '') {
+            $this->info('Updating Custom Panel DNS record');
+            $details = collect([
+                'type' => 'A',
+                'name' => $domain->panel,
+                'content' => $server->ip_address,
+                'ttl' => 0,
+                'proxied' => false
+            ])->toArray();
+            $dnsclient->updateRecord($panel, $details);
+        } else {
+            $this->info('Adding Custom Panel DNS record');
+            $dnsclient->addRecords('A', $domain->panel, $server->ip_address, 0, false);
+        }
+
+        // Add/Update Panel DNS Record
+        $www = $dnsclient->getRecordID('CNAME', sprintf('%s.%s', 'www', $domain->name));
+        if ($www != '') {
+            $this->info('Updating CNAME DNS record');
+            $details = collect([
+                'type' => 'CNAME',
+                'name' => 'www',
+                'content' => $domain->name,
+                'ttl' => 0,
+                'proxied' => false
+            ])->toArray();
+            $dnsclient->updateRecord($www, $details);
+        } else {
+            $this->info('Adding CNAME DNS record');
+            $dnsclient->addRecords('CNAME', 'www', $domain->name, 0, false);
+        }
+
+        $this->info('DNS Update Complete!');
+
         return Command::SUCCESS;
     }
 }

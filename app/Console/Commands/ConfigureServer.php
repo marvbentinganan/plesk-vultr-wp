@@ -48,6 +48,7 @@ class ConfigureServer extends Command
         $customer = $domain->customer;
         $server = $domain->server;
 
+        // Generate API Key
         if (!$server->plesk_instance()->exists()) {
             $pleskAdminClient = new AdminClient($server->ip_address, $server->default_password);
             $this->info('Generating Plesk API Key');
@@ -71,30 +72,23 @@ class ConfigureServer extends Command
         // Configure Panel URL and Login
         if ($plesk->custom_panel == false) {
             $this->info('Setting Up Panel');
-            $pleskClient->initialize($customer, config('services.plesk.panel_password'), $domain->panel);
+            $initialize = $pleskClient->initialize($customer, config('services.plesk.panel_password'), $domain->panel);
             $this->info('Updating Panel Hostname');
             $pleskClient->setHostname($domain->panel);
             $plesk->update([
                 'custom_panel' => true
             ]);
             $this->info('Hostname Updated');
-        }
-
-        // Add Panel SSL Certificate
-        if ($plesk->panel_certificate == false) {
-            $this->info('Securing Panel with SSL Certificate');
-            $pleskClient->addPanelCertificate($domain->panel, $customer->email);
-            $pleskClient->enableKeepSecured();
-            $plesk->update([
-                'panel_certificate' => true
-            ]);
-            $this->info('SSL Certificate added to Panel');
+            sleep(5);
         }
 
         // Add Domain to Plesk
         if ($plesk->attached_domain == false) {
             $this->info('Adding Domain to Panel');
             $addDomain = $pleskClient->addDomain($domain->name);
+            $domain->update([
+                'guid' => $addDomain->collect()['guid']
+            ]);
             $plesk->update([
                 'attached_domain' => true
             ]);
@@ -104,24 +98,22 @@ class ConfigureServer extends Command
         // Add SSL Certificate to domain
         if ($domain->ssl_certificate == false) {
             $this->info('Securing Site with SSL Certificate');
-            $certificate = $pleskClient->addDomainCertificate($customer->email, $domain->name);
+            $pleskClient->addDomainCertificate($customer->email, $domain->name);
             $domain->update([
                 'ssl_certificate' => true
             ]);
             $this->info('Primary Domain secured with SSL Certificate');
         }
 
-        // Improve SSL Settings
-        if ($domain->improved_ssl == false) {
-            $this->info('Improving SSL Settings');
-            $hsts = $pleskClient->enableHSTS($domain->name)->collect();
-            $this->info("{$hsts['stdout']}");
-            $ocsp = $pleskClient->enableOCSP($domain->name)->collect();
-            $this->info("{$ocsp['stdout']}");
-
-            $domain->update([
-                'improved_ssl' => true
+        // Add SSL Certificate to Plesk Panel
+        if ($plesk->panel_certificate == false) {
+            $this->info('Securing Panel with SSL Certificate');
+            $pleskClient->enableKeepSecured();
+            $pleskClient->setPanelCertificate($domain->panel, $customer->email);
+            $plesk->update([
+                'panel_certificate' => true
             ]);
+            $this->info('SSL Certificate added to Panel');
         }
 
         // Install WordPress
@@ -139,6 +131,19 @@ class ConfigureServer extends Command
             $pleskClient->enableCaching($domain->name);
             $domain->update([
                 'caching_enabled' => true
+            ]);
+        }
+
+        // Improve SSL Settings
+        if ($domain->improved_ssl == false) {
+            $this->info('Improving SSL Settings');
+            $hsts = $pleskClient->enableHSTS($domain->name)->collect();
+            $this->info("{$hsts['stdout']}");
+            $ocsp = $pleskClient->enableOCSP($domain->name)->collect();
+            $this->info("{$ocsp['stdout']}");
+
+            $domain->update([
+                'improved_ssl' => true
             ]);
         }
 

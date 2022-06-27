@@ -40,4 +40,9 @@ return [
         'api' => env('VULTR_API'),
         'api_endpoint' => env('VULTR_API_ENDPOINT')
     ],
+
+    'cloudflare' => [
+        'username' => env('CLOUDFLARE_USER'),
+        'api_key' => env('CLOUDFLARE_API')
+    ]
 ];

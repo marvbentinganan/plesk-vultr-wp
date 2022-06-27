@@ -16,7 +16,7 @@ class UpdateDNS extends Command
      */
     protected $signature = 'vp:update-dns
                             {--domainId=}
-                            {--serverId=}';
+                            {--ipAddress=}';
 
     /**
      * The console command description.
@@ -43,7 +43,7 @@ class UpdateDNS extends Command
     public function handle()
     {
         $domain = Domain::find($this->option('domainId'));
-        $server = Server::find($this->option('serverId'));
+        $ipAddress = Server::find($this->option('ipAddress'));
 
         $dnsclient = new Client($domain->name);
 
@@ -54,14 +54,14 @@ class UpdateDNS extends Command
             $details = collect([
                 'type' => 'A',
                 'name' => $domain->name,
-                'content' => $server->ip_address,
+                'content' => $ipAddress,
                 'ttl' => 0,
                 'proxied' => false
             ])->toArray();
             $dnsclient->updateRecord($primary, $details);
         } else {
             $this->info('Adding Primary DNS record');
-            $dnsclient->addRecords('A', $domain->name, $server->ip_address, 0, false);
+            $dnsclient->addRecords('A', $domain->name, $ipAddress, 0, false);
         }
 
         // Add/Update Panel DNS Record
@@ -71,14 +71,14 @@ class UpdateDNS extends Command
             $details = collect([
                 'type' => 'A',
                 'name' => $domain->webmail,
-                'content' => $server->ip_address,
+                'content' => $ipAddress,
                 'ttl' => 0,
                 'proxied' => false
             ])->toArray();
             $dnsclient->updateRecord($webmail, $details);
         } else {
             $this->info('Adding Webmail DNS record');
-            $dnsclient->addRecords('A', $domain->panel, $server->ip_address, 0, false);
+            $dnsclient->addRecords('A', $domain->panel, $ipAddress, 0, false);
         }
 
         // Add/Update Panel DNS Record
@@ -88,14 +88,14 @@ class UpdateDNS extends Command
             $details = collect([
                 'type' => 'A',
                 'name' => $domain->panel,
-                'content' => $server->ip_address,
+                'content' => $ipAddress,
                 'ttl' => 0,
                 'proxied' => false
             ])->toArray();
             $dnsclient->updateRecord($panel, $details);
         } else {
             $this->info('Adding Custom Panel DNS record');
-            $dnsclient->addRecords('A', $domain->panel, $server->ip_address, 0, false);
+            $dnsclient->addRecords('A', $domain->panel, $ipAddress, 0, false);
         }
 
         // Add/Update Panel DNS Record

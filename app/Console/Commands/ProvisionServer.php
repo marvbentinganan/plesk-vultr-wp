@@ -75,8 +75,8 @@ class ProvisionServer extends Command
             $instance = $response->collect()['instance'];
             $status = $instance['status'];
 
-            $this->info('Server is still provisioning...');
-            // Pause for a minutes before checking again
+            $this->line('Server is still provisioning...');
+            // Pause for a minute before checking again
             sleep(60);
         } while ($status != 'active');
 
@@ -92,6 +92,7 @@ class ProvisionServer extends Command
 
         // Update DNS Records
         $this->call('vp:update-dns', ['--domainId' => $domain->getKey(), '--ipAddress' => $server->ip_address]);
+
         // Configure the Server
         $this->call('vp:configure-server', ['--domainId' => $domain->getKey()]);
 

@@ -28,16 +28,18 @@ class Client
     /**
      * Setup Administrator user and Custom Panel Domain
      *
-     * @param Customer $customer
+     * @param string $name
+     * @param string $email
      * @param string $password
+     * @param string $panel
      * @return Response
      */
-    public function initialize(Customer $customer, string $password, string $panel)
+    public function initialize(string $name, string $email, string $password, string $panel)
     {
         $data = collect([
             'admin' => [
-                'name' => $customer->name,
-                'email' => $customer->email
+                'name' => $name,
+                'email' => $email
             ],
             'password' => $password,
             'server_name' => $panel
@@ -46,7 +48,13 @@ class Client
         return $this->client->post("{$this->host}/server/init", $data);
     }
 
-    public function setHostname($hostname)
+    /**
+     * Update Planel Hostname
+     *
+     * @param string $hostname
+     * @return void
+     */
+    public function setHostname(string $hostname)
     {
         $data = collect([
             'params' => [
@@ -87,6 +95,13 @@ class Client
         return $this->client->post("{$this->host}/domains", $data);
     }
 
+    /**
+     * Install WordPress site on the domain
+     *
+     * @param string $email
+     * @param string $domain
+     * @return Response
+     */
     public function installWordPress(string $email, string $domain)
     {
         $data = collect([
@@ -107,20 +122,26 @@ class Client
         return $this->client->post("{$this->host}/cli/extension/call", $data);
     }
 
+    /**
+     * Enable Nginx Caching
+     *
+     * @param string $domain
+     * @return Response
+     */
     public function enableCaching(string $domain)
     {
         $data = collect([
             'params' => [
-            '--update-web-server-settings',
-            $domain,
-            '-nginx-cache-enabled',
-            'true',
-            '-nginx-cache-timeout',
-            '60',
-            '-nginx-cache-key',
-            sprintf('%s%s%s', "'", '$scheme$request_method$host$request_uri', "'"),
-            '-nginx-cache-bypass-locations',
-            "'/wp-admin/'"
+                '--update-web-server-settings',
+                $domain,
+                '-nginx-cache-enabled',
+                'true',
+                '-nginx-cache-timeout',
+                '60',
+                '-nginx-cache-key',
+                sprintf('%s%s%s', "'", '$scheme$request_method$host$request_uri', "'"),
+                '-nginx-cache-bypass-locations',
+                "'/wp-admin/'"
             ]
         ])->toArray();
 
@@ -145,22 +166,29 @@ class Client
         return $this->client->post("{$this->host}/cli/server_pref/call", $data);
     }
 
+    /**
+     * Secre domain with an SSL Certificate
+     *
+     * @param string $email
+     * @param string $domain
+     * @return Response
+     */
     public function addDomainCertificate(string $email, string $domain)
     {
         $data = collect([
             'params' => [
-            '--call',
-            'sslit',
-            '--certificate',
-            '-issue',
-            '-domain',
-            $domain,
-            '-registrationEmail',
-            $email,
-            '-secure-domain',
-            '-secure-www',
-            '-secure-webmail',
-            '-secure-mail'
+                '--call',
+                'sslit',
+                '--certificate',
+                '-issue',
+                '-domain',
+                $domain,
+                '-registrationEmail',
+                $email,
+                '-secure-domain',
+                '-secure-www',
+                '-secure-webmail',
+                '-secure-mail'
             ]
         ])->toArray();
 
@@ -170,16 +198,16 @@ class Client
     /**
      * Enable Keep Plesk Secured
      *
-     * @return void
+     * @return Response
      */
     public function enableKeepSecured()
     {
         $data = collect([
             'params' => [
-            '--call',
-            'sslit',
-            '--panel-keep-secured',
-            '-enable'
+                '--call',
+                'sslit',
+                '--panel-keep-secured',
+                '-enable'
             ]
         ])->toArray();
 
@@ -196,12 +224,12 @@ class Client
     {
         $data = collect([
             'params' => [
-            '--call',
-            'sslit',
-            '--hsts',
-            '-enable',
-            '-domain',
-            $domain,
+                '--call',
+                'sslit',
+                '--hsts',
+                '-enable',
+                '-domain',
+                $domain,
             ]
         ])->toArray();
 
@@ -218,12 +246,12 @@ class Client
     {
         $data = collect([
             'params' => [
-            '--call',
-            'sslit',
-            '--ocsp-stapling',
-            '-enable',
-            '-domain',
-            $domain,
+                '--call',
+                'sslit',
+                '--ocsp-stapling',
+                '-enable',
+                '-domain',
+                $domain,
             ]
         ])->toArray();
 

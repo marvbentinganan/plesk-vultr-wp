@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use App\Models\Server;
+use App\Services\Vultr\Models\Server;
 use Illuminate\Console\Command;
 use Spatie\Ssh\Ssh;
 
@@ -44,7 +44,6 @@ class InstallPleskFirewall extends Command
         $command = 'plesk installer add --components psa-firewall';
 
         $process = Ssh::create('root', $server->ip_address)->disableStrictHostKeyChecking()->execute($command);
-        dump($process->getOutput());
 
         return Command::SUCCESS;
     }

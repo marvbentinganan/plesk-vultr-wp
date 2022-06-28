@@ -35,7 +35,7 @@ This is an API endpoint and service to deploy and configure a Plesk instance on 
 - [x] Install WordPress Site
 - [x] Enable Nginx Caching
 - [x] Enable IPV4 Reverse DNS
-- [ ] Install and Enable Firewall
+- [x] Install and Enable Firewall
 
 ### QOL Changes
 

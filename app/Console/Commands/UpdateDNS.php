@@ -4,7 +4,6 @@ namespace App\Console\Commands;
 
 use App\Models\Domain;
 use App\Services\DNS\Cloudflare\Client;
-use App\Services\Vultr\Models\Server;
 use Illuminate\Console\Command;
 
 class UpdateDNS extends Command
@@ -43,7 +42,7 @@ class UpdateDNS extends Command
     public function handle()
     {
         $domain = Domain::find($this->option('domainId'));
-        $ipAddress = Server::find($this->option('ipAddress'));
+        $ipAddress = $this->option('ipAddress');
 
         $dnsclient = new Client($domain->name);
 
@@ -78,7 +77,7 @@ class UpdateDNS extends Command
             $dnsclient->updateRecord($webmail, $details);
         } else {
             $this->info('Adding Webmail DNS record');
-            $dnsclient->addRecords('A', $domain->panel, $ipAddress, 0, false);
+            $dnsclient->addRecords('A', $domain->webmail, $ipAddress, 0, false);
         }
 
         // Add/Update Panel DNS Record

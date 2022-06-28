@@ -28,12 +28,12 @@ class OrderSeeder extends Seeder
 
         $customer->domains()->updateOrCreate(
             [
-                'name' => 'marviebenti.com'
+                'name' => 'elendil.uk'
             ],
             [
-                'name' => 'marviebenti.com',
-                'panel' => 'panel.marviebenti.com',
-                'webmail' => 'webmail.marviebenti.com'
+                'name' => 'elendil.uk',
+                'panel' => 'panel.elendil.uk',
+                'webmail' => 'webmail.elendil.uk'
             ]
         );
     }

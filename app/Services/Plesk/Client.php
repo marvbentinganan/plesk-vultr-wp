@@ -149,21 +149,65 @@ class Client
     }
 
     /**
-     * Add Let's Encrypt SSL Certificate to Plesk Panel
+     * Add an SSL Certificate to Plesk Panel
+     *
+     * @param string $domain
+     * @param string $panel
+     * @param string $email
+     * @return Response
+     */
+    public function addPanelCertificate(string $domain, string $email)
+    {
+        $data = collect([
+            '--exec',
+            'letsencrypt',
+            'cli.php',
+            '--secure-plesk',
+            '-m',
+            $email,
+            '-w',
+            '/var/www/vhosts/default/htdocs',
+            '-d',
+            $domain,
+        ])->toArray();
+
+        return $this->client->post("{$this->host}/cli/extension/call", $data);
+    }
+
+    /**
+     * Set SSL Certificate for Plesk Panel
      *
      * @return Response
      */
-    public function setPanelCertificate(string $domain, string $email)
+    public function setPanelCertificate(string $ipAddress)
     {
         $data = collect([
             'params' => [
-                '--update',
-                '-panel-certificate',
+                '--assign-cert',
+                'Lets Encrypt certificate',
+                '-ip',
+                $ipAddress
+            ]
+        ])->toArray();
+
+        return $this->client->post("{$this->host}/cli/certificate/call", $data);
+    }
+
+    /**
+     * Set SSL Certificate for Mail Server
+     *
+     * @return Response
+     */
+    public function setMailserverCertificate()
+    {
+        $data = collect([
+            'params' => [
+                '--set-certificate',
                 'Lets Encrypt certificate'
             ]
         ])->toArray();
 
-        return $this->client->post("{$this->host}/cli/server_pref/call", $data);
+        return $this->client->post("{$this->host}/cli/mailserver/call", $data);
     }
 
     /**

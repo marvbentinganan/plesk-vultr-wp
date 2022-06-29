@@ -2,10 +2,16 @@
 
 This is an API endpoint and service to deploy and configure a Plesk instance on a Vultr server.
 
+## Requirements
+
+- An API Key from Vultr.
+- An SSH Key from the Server where the App is deployed in needs to be added to the Vultr Account and the SSH Key ID should be retrieved from Vultr's API.
+
 ## APIs Used
 
 - Vultr
 - Plesk
+- Cloudflare
 
 ## Usage
 
@@ -15,12 +21,11 @@ This is an API endpoint and service to deploy and configure a Plesk instance on 
 2. Choose Domain ID from the List and Provision Plesk Server.
     - `php artisan vp:provision-server --domainId={domain_id-here}`
 
-3. Update DNS Records (manually for now).
+3. Update DNS Records (Cloudflare).
+    - `php artisan vp:update-dns --domainId={domain_id-here} --ipAddress={ip_address-here}`
 
 4. Configure the Plesk Instance.
     - `php artisan vp:configure-server --domainId={domain_id-here}`
-
-5. Install and enable Plesk Firewall.
 
 ### To Do
 

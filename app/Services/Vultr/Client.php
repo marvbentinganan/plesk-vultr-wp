@@ -56,7 +56,7 @@ class Client
             'plan' => $plan,
             'app_id' => $appId,
             'activation_email' => true,
-            'sshkey_id' => ['17cdbce3-d562-4227-a1e8-a3f90b875396'],
+            'sshkey_id' => [config('services.plesk.ssh-id')],
             'backups' => 'enabled',
             'hostname' => sprintf('%s-%s-%s-%s', 'vtr', $region, 'web', Str::random(3)),
             'label' => sprintf('%s-%s-%s-%s', 'vtr', $region, 'web', Str::random(3))

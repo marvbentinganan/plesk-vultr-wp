@@ -38,7 +38,8 @@ return [
 
     'vultr' => [
         'api' => env('VULTR_API'),
-        'api_endpoint' => env('VULTR_API_ENDPOINT')
+        'api_endpoint' => env('VULTR_API_ENDPOINT', 'https://api.vultr.com/v2'),
+        'ssh-id' => env('VULTR_SSH_ID')
     ],
 
     'cloudflare' => [

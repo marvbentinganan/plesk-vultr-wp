@@ -114,6 +114,8 @@ class UpdateDNS extends Command
             $dnsclient->addRecords('CNAME', 'www', $domain->name, 0, false);
         }
 
+        sleep(5);
+
         $this->info('DNS Update Complete!');
 
         return Command::SUCCESS;

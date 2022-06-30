@@ -41,9 +41,9 @@ This is an API endpoint and service to deploy and configure a Plesk instance on 
 - [x] Enable Nginx Caching
 - [x] Enable IPV4 Reverse DNS
 - [x] Install and Enable Firewall
+- [x] Send Email Notifications
 
 ### QOL Changes
 
 - Better Folder Structure
 - Error Exception Handling
-- Sending of Email Notifications

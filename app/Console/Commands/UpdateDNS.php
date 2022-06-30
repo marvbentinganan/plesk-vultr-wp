@@ -49,7 +49,7 @@ class UpdateDNS extends Command
         // Add/Update Primary DNS Record
         $primary = $dnsclient->getRecordID('A', $domain->name);
         if ($primary != '') {
-            $this->info('Updating Primary DNS record');
+            $this->line('Updating Primary DNS record');
             $details = collect([
                 'type' => 'A',
                 'name' => $domain->name,
@@ -59,14 +59,14 @@ class UpdateDNS extends Command
             ])->toArray();
             $dnsclient->updateRecord($primary, $details);
         } else {
-            $this->info('Adding Primary DNS record');
+            $this->line('Adding Primary DNS record');
             $dnsclient->addRecords('A', $domain->name, $ipAddress, 0, false);
         }
 
         // Add/Update Panel DNS Record
         $webmail = $dnsclient->getRecordID('A', $domain->webmail);
         if ($webmail != '') {
-            $this->info('Updating Webmail DNS record');
+            $this->line('Updating Webmail DNS record');
             $details = collect([
                 'type' => 'A',
                 'name' => $domain->webmail,
@@ -76,14 +76,14 @@ class UpdateDNS extends Command
             ])->toArray();
             $dnsclient->updateRecord($webmail, $details);
         } else {
-            $this->info('Adding Webmail DNS record');
+            $this->line('Adding Webmail DNS record');
             $dnsclient->addRecords('A', $domain->webmail, $ipAddress, 0, false);
         }
 
         // Add/Update Panel DNS Record
         $panel = $dnsclient->getRecordID('A', $domain->panel);
         if ($panel != '') {
-            $this->info('Updating Custom Panel DNS record');
+            $this->line('Updating Custom Panel DNS record');
             $details = collect([
                 'type' => 'A',
                 'name' => $domain->panel,
@@ -93,14 +93,14 @@ class UpdateDNS extends Command
             ])->toArray();
             $dnsclient->updateRecord($panel, $details);
         } else {
-            $this->info('Adding Custom Panel DNS record');
+            $this->line('Adding Custom Panel DNS record');
             $dnsclient->addRecords('A', $domain->panel, $ipAddress, 0, false);
         }
 
         // Add/Update Panel DNS Record
         $www = $dnsclient->getRecordID('CNAME', sprintf('%s.%s', 'www', $domain->name));
         if ($www != '') {
-            $this->info('Updating CNAME DNS record');
+            $this->line('Updating CNAME DNS record');
             $details = collect([
                 'type' => 'CNAME',
                 'name' => 'www',
@@ -110,7 +110,7 @@ class UpdateDNS extends Command
             ])->toArray();
             $dnsclient->updateRecord($www, $details);
         } else {
-            $this->info('Adding CNAME DNS record');
+            $this->line('Adding CNAME DNS record');
             $dnsclient->addRecords('CNAME', 'www', $domain->name, 0, false);
         }
 

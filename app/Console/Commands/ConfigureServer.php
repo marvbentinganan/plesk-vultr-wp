@@ -2,12 +2,15 @@
 
 namespace App\Console\Commands;
 
+use App\Mail\SetupComplete;
 use App\Models\Domain;
 use App\Services\Plesk\AdminClient;
 use App\Services\Plesk\Client;
 use App\Services\Plesk\Models\PleskInstance;
 use App\Services\Vultr\Client as VultrClient;
+use App\Services\Vultr\Models\Server;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Mail;
 use Spatie\Ssh\Ssh;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
@@ -161,11 +164,23 @@ class ConfigureServer extends Command
         // Install WordPress
         if ($plesk->wordpress_installed == false) {
             $this->line('Installing WordPress Site');
-            $install = $pleskClient->installWordPress(sprintf('%s@%s', $customer->username, $domain->name), $domain->name);
-            $plesk->update([
-                'wordpress_installed' => true
-            ]);
-            $this->info('WordPress Installed');
+            rescue(function () use ($plesk, $pleskClient, $customer, $domain) {
+                $install = $pleskClient->installWordPress(sprintf('%s@%s', $customer->username, $domain->name), $domain->name);
+                if ($install->collect()['code'] == 0) {
+                    $plesk->update([
+                        'wordpress_installed' => true
+                    ]);
+                    $this->info('WordPress Installed');
+                } else {
+                    $this->error('Failed to Install WordPress.');
+
+                    throw new HttpException(500, 'An error from the API occured.');
+                }
+            }, function () use ($plesk) {
+                $plesk->update([
+                    'wordpress_installed' => false
+                ]);
+            });
         }
 
         // Enable Caching
@@ -186,11 +201,6 @@ class ConfigureServer extends Command
             $server->update([
                 'ipv4_reverse_dns' => true
             ]);
-
-            $domain->update([
-                'status' => 'active',
-                'processed_at' => now()
-            ]);
         }
 
         // Install Firewall
@@ -206,11 +216,40 @@ class ConfigureServer extends Command
             $this->info('Plex Firewall Installed');
         }
 
-        $this->info('Configuration Complete!');
+        $status = $this->checkStatus($server, $plesk, $domain);
+
+        if ($status == true) {
+            $domain->update([
+                'status' => 'active',
+                'processed_at' => now()
+            ]);
+            $this->info('Configuration Complete!');
+            Mail::to(env('ADMIN_EMAIL'))->send(new SetupComplete($domain, $customer));
+        } else {
+            $this->error('Some Processes Failed. Configuration Incomplete.');
+        }
         // } else {
         //     $this->error('Please add/update your DNS Records before proceeding');
         // }
 
         return Command::SUCCESS;
+    }
+
+    public function checkStatus(Server $server, PleskInstance $plesk, Domain $domain)
+    {
+        if ($plesk->custom_panel == true
+            and $plesk->attached_domain == true
+            and $plesk->panel_certificate == true
+            and $plesk->wordpress_installed == true
+            and $plesk->firewall_installed == true
+            and $domain->ssl_certificate == true
+            and $domain->improved_ssl == true
+            and $domain->caching_enabled == true
+            and $server->ipv4_reverse_dns == true
+            ) {
+            return true;
+        }
+
+        return false;
     }
 }

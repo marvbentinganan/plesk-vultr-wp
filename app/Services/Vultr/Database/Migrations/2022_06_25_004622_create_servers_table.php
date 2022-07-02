@@ -15,6 +15,7 @@ class CreateServersTable extends Migration
     {
         Schema::create('servers', function (Blueprint $table) {
             $table->id('server_id');
+            $table->uuid('server_uid')->unique();
             $table->string('provider_id');
             $table->foreignId('customer_id')->references('customer_id')->on('customers');
             $table->ipAddress('ip_address');

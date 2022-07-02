@@ -6,6 +6,7 @@ use App\Models\Domain;
 use App\Services\Vultr\Client;
 use App\Services\Vultr\Models\Server;
 use Illuminate\Console\Command;
+use Illuminate\Support\Str;
 
 class ProvisionServer extends Command
 {
@@ -15,7 +16,7 @@ class ProvisionServer extends Command
      * @var string
      */
     protected $signature = 'vp:create-server
-                            {--domainId=}';
+                            {--domainUid=}';
 
     /**
      * The console command description.
@@ -41,7 +42,7 @@ class ProvisionServer extends Command
      */
     public function handle()
     {
-        $domain = Domain::find($this->option('domainId'));
+        $domain = Domain::where('domain_uid', $this->option('domainUid'))->first();
 
         $customer = $domain->customer;
 
@@ -53,6 +54,7 @@ class ProvisionServer extends Command
         $instance = $response->collect()['instance'];
 
         $server = Server::create([
+            'server_uid' => Str::uuid(16),
             'customer_id' => $customer->getKey(),
             'provider_id' => $instance['id'],
             'default_password' => $instance['default_password'],

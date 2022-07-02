@@ -14,7 +14,7 @@ class InstallPleskFirewall extends Command
      * @var string
      */
     protected $signature = 'vp:install-firewall
-                            {--serverId=}';
+                            {--serverUid=}';
 
     /**
      * The console command description.
@@ -40,7 +40,7 @@ class InstallPleskFirewall extends Command
      */
     public function handle()
     {
-        $server = Server::find($this->option('serverId'));
+        $server = Server::where('server_uid', $this->option('serverId'))->first();
         $command = 'plesk installer add --components psa-firewall';
 
         $process = Ssh::create('root', $server->ip_address)->disableStrictHostKeyChecking()->execute($command);

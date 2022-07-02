@@ -15,6 +15,7 @@ class CreatePleskInstancesTable extends Migration
     {
         Schema::create('plesk_instances', function (Blueprint $table) {
             $table->id('plesk_instance_id');
+            $table->uuid('plesk_instance_uid')->unique();
             $table->foreignId('server_id')->references('server_id')->on('servers');
             $table->foreignId('customer_id')->references('customer_id')->on('customers');
             $table->string('api_key')->nullable();

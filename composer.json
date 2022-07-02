@@ -11,8 +11,10 @@
         "guzzlehttp/guzzle": "^7.0.1",
         "laravel/framework": "^8.65",
         "laravel/horizon": "^5.7",
+        "laravel/jetstream": "^2.9",
         "laravel/sanctum": "^2.11",
         "laravel/tinker": "^2.5",
+        "livewire/livewire": "^2.5",
         "spatie/ssh": "^1.7"
     },
     "require-dev": {

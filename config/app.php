@@ -178,6 +178,7 @@ return [
         App\Providers\RouteServiceProvider::class,
         App\Services\Vultr\VultrServiceProvider::class,
         App\Services\Plesk\PleskServiceProvider::class,
+        App\Services\WooCommerce\WooCommerceServiceProvider::class,
     ],
 
     /*

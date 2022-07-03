@@ -45,5 +45,11 @@ return [
     'cloudflare' => [
         'username' => env('CLOUDFLARE_USER'),
         'api_key' => env('CLOUDFLARE_API')
+    ],
+
+    'woocommerce' => [
+        'key' => env('WOOCOMMERCE_KEY'),
+        'secret' => env('WOOCOMMERCE_SECRET'),
+        'endpoint' => env('WOOCOMMERCE_ENDPOINT')
     ]
 ];

@@ -22,7 +22,8 @@ class ConfigureServer extends Command
      * @var string
      */
     protected $signature = 'vp:configure-server
-                            {--domainId=}';
+                            {--domainId=}
+                            {--validateDNS=false}';
 
     /**
      * The console command description.
@@ -53,7 +54,15 @@ class ConfigureServer extends Command
         $customer = $domain->customer;
         $server = $domain->server;
 
-        // if (gethostbyname($domain->name) == $server->ip_address) {
+        if ($this->option('validateDNS') == true) {
+            $valid = (gethostbyname($domain->name) == $server->ip_address);
+            if ($valid == false) {
+                $this->error("It looks like your Domain does not resolve to your server's IP Address.");
+
+                return Command::FAILURE;
+            }
+        }
+
         // Generate API Key
         if (!$server->plesk_instance()->exists()) {
             $pleskAdminClient = new AdminClient($server->ip_address, $server->default_password);
@@ -228,9 +237,6 @@ class ConfigureServer extends Command
         } else {
             $this->error('Some Processes Failed. Configuration Incomplete.');
         }
-        // } else {
-        //     $this->error('Please add/update your DNS Records before proceeding');
-        // }
 
         return Command::SUCCESS;
     }

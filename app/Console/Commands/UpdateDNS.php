@@ -14,7 +14,7 @@ class UpdateDNS extends Command
      * @var string
      */
     protected $signature = 'vp:update-dns
-                            {--domainId=}
+                            {--domainUid=}
                             {--ipAddress=}';
 
     /**
@@ -41,7 +41,7 @@ class UpdateDNS extends Command
      */
     public function handle()
     {
-        $domain = Domain::find($this->option('domainId'));
+        $domain = Domain::where('domain_uid', $this->option('domainUid'))->first();
         $ipAddress = $this->option('ipAddress');
 
         $dnsclient = new Client($domain->name);

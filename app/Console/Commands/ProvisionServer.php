@@ -48,7 +48,7 @@ class ProvisionServer extends Command
 
         $client = new Client();
 
-        $response = $client->createInstance();
+        $response = $client->createInstance(31, 'lhr', 'vc2-1c-2gb');
 
         // Create Server record
         $instance = $response->collect()['instance'];
@@ -93,10 +93,10 @@ class ProvisionServer extends Command
         $this->info("Server created with IP Address: {$server->ip_address}");
 
         // Update DNS Records
-        //$this->call('vp:update-dns', ['--domainId' => $domain->getKey(), '--ipAddress' => $server->ip_address]);
+        //$this->call('vp:update-dns', ['--domainUid' => $domain->domain_uid, '--ipAddress' => $server->ip_address]);
 
         // Configure the Server
-        //$this->call('vp:configure-server', ['--domainId' => $domain->getKey()]);
+        //$this->call('vp:configure-server', ['--domainUid' => $domain->domain_uid]);
 
         return Command::SUCCESS;
     }

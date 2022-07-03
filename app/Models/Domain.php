@@ -31,4 +31,14 @@ class Domain extends Model
     {
         return $this->belongsTo(Server::class, 'server_id', 'server_id');
     }
+
+    public function scopePendingProvision($query)
+    {
+        return $query->whereNull('server_id');
+    }
+
+    public function scopePendingConfiguration($query)
+    {
+        return $query->whereNull('plesk_instance_id');
+    }
 }

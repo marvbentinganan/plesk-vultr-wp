@@ -38,9 +38,9 @@ class PendingDomains extends Command
      */
     public function handle()
     {
-        $domains = Domain::where('status', 'pending')->get(['domain_id', 'name', 'status']);
+        $domains = Domain::where('status', 'pending')->get(['domain_id', 'domain_uid', 'name', 'status']);
 
-        $this->table(['ID', 'Name', 'Status'], $domains->toArray());
+        $this->table(['ID', 'UUID', 'Name', 'Status'], $domains->toArray());
 
         return Command::SUCCESS;
     }

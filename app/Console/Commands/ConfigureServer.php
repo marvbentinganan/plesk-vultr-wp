@@ -11,6 +11,7 @@ use App\Services\Vultr\Client as VultrClient;
 use App\Services\Vultr\Models\Server;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 use Spatie\Ssh\Ssh;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
@@ -22,7 +23,7 @@ class ConfigureServer extends Command
      * @var string
      */
     protected $signature = 'vp:configure-server
-                            {--domainId=}
+                            {--domainUid=}
                             {--validateDNS=false}';
 
     /**
@@ -49,7 +50,7 @@ class ConfigureServer extends Command
      */
     public function handle()
     {
-        $domain = Domain::find($this->option('domainId'));
+        $domain = Domain::where('domain_uid', $this->option('domainUid'))->first();
 
         $customer = $domain->customer;
         $server = $domain->server;
@@ -70,6 +71,7 @@ class ConfigureServer extends Command
             $apiKey = $pleskAdminClient->createApiKey()->collect();
 
             $plesk = PleskInstance::create([
+                    'plesk_instance_uid' => Str::uuid(16),
                     'server_id' => $server->getKey(),
                     'customer_id' => $customer->getKey(),
                     'api_key' => $apiKey['key'],

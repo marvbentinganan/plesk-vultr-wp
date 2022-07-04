@@ -21,7 +21,7 @@ class OrderSeeder extends Seeder
             ],
             [
                 'name' => 'Marvin Bentinganan',
-                'customer_uid' => Str::uuid(16),
+                'customer_uid' => Str::uuid(8),
                 'email' => 'marvbentinganan@gmail.com',
                 'username' => 'marviebenti',
                 'company' => 'Mariner, LLC'
@@ -33,7 +33,7 @@ class OrderSeeder extends Seeder
                 'name' => 'elendil.uk'
             ],
             [
-                'domain_uid' => Str::uuid(16),
+                'domain_uid' => Str::uuid(8),
                 'name' => 'elendil.uk',
                 'panel' => 'panel.elendil.uk',
                 'webmail' => 'webmail.elendil.uk'

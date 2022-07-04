@@ -71,7 +71,7 @@ class ConfigureServer extends Command
             $apiKey = $pleskAdminClient->createApiKey()->collect();
 
             $plesk = PleskInstance::create([
-                    'plesk_instance_uid' => Str::uuid(16),
+                    'plesk_instance_uid' => Str::uuid(8),
                     'server_id' => $server->getKey(),
                     'customer_id' => $customer->getKey(),
                     'api_key' => $apiKey['key'],

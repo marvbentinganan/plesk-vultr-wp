@@ -54,7 +54,7 @@ class ProvisionServer extends Command
         $instance = $response->collect()['instance'];
 
         $server = Server::create([
-            'server_uid' => Str::uuid(16),
+            'server_uid' => Str::uuid(8),
             'customer_id' => $customer->getKey(),
             'provider_id' => $instance['id'],
             'default_password' => $instance['default_password'],

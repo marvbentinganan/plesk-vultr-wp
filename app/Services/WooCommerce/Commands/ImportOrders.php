@@ -3,6 +3,7 @@
 namespace App\Services\WooCommerce\Commands;
 
 use App\Services\WooCommerce\Client;
+use App\Services\WooCommerce\Models\WooCommerceOrder;
 use Illuminate\Console\Command;
 
 class ImportOrders extends Command
@@ -12,14 +13,14 @@ class ImportOrders extends Command
      *
      * @var string
      */
-    protected $signature = 'command:name';
+    protected $signature = 'wc:import-paid-orders';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Command description';
+    protected $description = 'Import Orders from WooCommerce API';
 
     /**
      * Create a new command instance.
@@ -41,6 +42,13 @@ class ImportOrders extends Command
         $woocommerce = new Client();
 
         $orders = $woocommerce->getPaidOrders()->collect();
+
+        $orders->each(function ($order) {
+            WooCommerceOrder::create([
+                'source_order_id' => $order['id'],
+                'data' => collect($order)
+            ]);
+        });
 
         return Command::SUCCESS;
     }

@@ -46,7 +46,7 @@ class Client
         return $this->client->get("{$this->apiUrl}/ssh-keys");
     }
 
-    public function createInstance(int $appId = 31, string $region = 'lhr', string $plan = 'vc2-1c-2gb')
+    public function createInstance(int $appId, string $region, string $plan)
     {
         // Define defaults
         // App ID 31 is Plesk Web Admin
@@ -56,7 +56,7 @@ class Client
             'plan' => $plan,
             'app_id' => $appId,
             'activation_email' => true,
-            'sshkey_id' => [config('services.plesk.ssh-id')],
+            'sshkey_id' => ['17cdbce3-d562-4227-a1e8-a3f90b875396'],
             'backups' => 'enabled',
             'hostname' => sprintf('%s-%s-%s-%s', 'vtr', $region, 'web', Str::random(3)),
             'label' => sprintf('%s-%s-%s-%s', 'vtr', $region, 'web', Str::random(3))

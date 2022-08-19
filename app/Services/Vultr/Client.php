@@ -65,6 +65,16 @@ class Client
         return $this->client->post("{$this->apiUrl}/instances", $data);
     }
 
+    public function deleteInstance(string $instanceId)
+    {
+        return $this->client->delete("{$this->apiUrl}/instances/{$instanceId}");
+    }
+
+    public function reinstallInstance(string $instanceId)
+    {
+        return $this->client->get("{$this->apiUrl}/instances/{$instanceId}/reinstall");
+    }
+
     public function getInstance(string $instanceId)
     {
         return $this->client->get("{$this->apiUrl}/instances/{$instanceId}");

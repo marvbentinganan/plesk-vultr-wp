@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Repository\Server\ServerInterface;
+use App\Repositories\Server\ServerInterface;
 
 class ServerController extends Controller
 {

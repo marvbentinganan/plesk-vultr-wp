@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Repository\Server;
+namespace App\Repositories\Server;
 
 use Illuminate\Support\Str;
 use App\Services\Vultr\Models\Server;
-use App\Repository\Server\ServerInterface;
+use App\Repositories\Server\ServerInterface;
 
 use App\Services\Vultr\Endpoints\Server as VultrServer;
 
